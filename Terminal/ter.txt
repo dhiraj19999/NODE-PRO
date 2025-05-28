@@ -1,0 +1,28 @@
+A terminal is essentially a text-based user interface for interacting with computers.
+ It allows users to execute commands and view the results, as well as control applications
+  running on the computer.
+
+BASIC  SHELL  COMMANDS
+
+1. echo  =>  echo is like console.log or print
+2. pwd => print working directory
+3. whoami => print current user
+4 cd =>   change directory   ../ => ek level up that is ek level parent up
+5 ls =>  show the lists of files inside current directory
+6 ls a => show all fles including hidden one 
+7 touch => to create a new files
+8 mkdir => to create a new folder
+9  cp => to copy the file => example cp index.js src => index.js  src folder me copy hoga
+10 mv => to move the file => example cp index.js src => index.js  src folder me move hoga
+11 rm=> to delete the empty  file
+12 rmdir => to remove the empty  folder
+13 rm -r => kisi folder ke under ke files ko delete kr dega and folder ko bhi => rm -r src => src ke under ke sare files ko delete kr dega
+14 rmdir -r => 
+15 cat => to read the file   cat index.js
+16 nano => to edit the file   
+
+In computing, a prompt is a visual indicator, usually text or symbols, that tells the user
+ the computer is ready to accept input, such as a command or a response to a question
+ example  :   
+Dhiraj@DESKTOP-6SE2HJE MINGW64 ~/Desktop/NODE-PRO (main)
+$
