@@ -1,0 +1,4 @@
+An operating system (OS) is a software that manages computer hardware and software resources, acting as a 
+bridge between the user and the machine's hardware. A kernel is the core of the OS, a program that manages 
+system resources, hardware, and processes. Think of the OS as the overall system, while the kernel is its central,
+ essential part. 
