@@ -1,0 +1,181 @@
+Modules in Node.js are reusable blocks of code that encapsulate related functionality. 
+They are similar to libraries in other programming environments, promoting code organization, 
+reusability, and maintainability.
+
+commonJS Modules: Node.js uses CommonJS modules, which are based on the require() function for importing 
+and module.exports for exporting modules. This is the default module system used in Node.js.
+Difference between module.exports and exports 
+Module.exports
+
+When we want to export a single class/variable/function from one module to another module, we use the 
+module.exports way.
+
+Exports
+
+When we want to export multiple variables/functions from one module to another, we use exports way.
+// Filename: calculator.js
+
+exports.add = (a, b) => a + b;
+exports.subtract = (a, b) => a - b;
+exports.multiply = (a, b) => a * b;
+exports.divide = (a, b) => {
+    if (b != 0) {
+        return a / b;
+    }
+    return `Divided by zero !!!`;
+}
+
+// Filename: operation.js
+
+const Arithmetic = require("./calculator.js");
+
+console.log(`Addition -> ${Arithmetic.add(100, 40)}`);
+console.log(
+    `subtraction -> ${Arithmetic.subtract(100, 40)}`);
+console.log(
+    `Multiplication -> ${Arithmetic.multiply(100, 40)}`);
+console.log(`Division -> ${Arithmetic.divide(100, 40)}`);
+the difference between module.exports and exports in Node.js. 
+We've seen that module.exports is used to export a single function or object from a module, 
+while exports is used to export multiple properties or functions
+module is an object that contains all the properties and methods defined in the module. 
+and exports is an object inside the module oject means exports is a property of module object.
+
+
+
+
+Module Wrapper Function in Node.js
+In Node.js, every module is wrapped in a wrapper function to create a scope for the module's code. This ensures that the variables declared within a module are local to that module, and don’t conflict with variables in other modules.
+
+Wrapper Function Structure:
+When you require a module, Node.js wraps the module code inside a function like this:
+
+javascript
+Copy
+(function(exports, require, module, __filename, __dirname) {
+  // Module code here
+});
+This module wrapper function is automatically added by Node.js to your code. It provides the following parameters:
+
+exports: An object that will be used to expose the public API of the module. Whatever properties are added to exports will be accessible when the module is require()d in other files.
+
+require: A function that allows you to import other modules.
+
+module: An object that contains information about the current module. It has a property module.exports which defines what will be exported from the module.
+
+__filename: The absolute path of the current module file.
+
+__dirname: The directory path of the current module.
+
+Why the Wrapper Function?
+The wrapper function ensures that:
+
+Encapsulation: Each module has its own local scope. This prevents global variables from interfering with each other.
+
+Module Caching: Once a module is loaded, Node.js caches the module’s exports, so it doesn’t execute the same module multiple times.
+
+Exporting: The exports object allows you to define the public API of a module. Anything added to exports is accessible when the module is required elsewhere.
+
+Example:
+Here’s an example to illustrate how the wrapper function works:
+
+module.js:
+javascript
+Copy
+// The code inside module.js is wrapped in a function like this:
+
+(function(exports, require, module, __filename, __dirname) {
+  // Inside this function, `exports` is local to this module
+  exports.greet = function(name) {
+    console.log('Hello, ' + name);
+  };
+})(exports, require, module, __filename, __dirname);
+app.js (requiring the module):
+javascript
+Copy
+const module = require('./module'); // The `greet` function is exposed through exports
+module.greet('John'); // Output: Hello, John
+How the Wrapper Function Works:
+exports.greet inside the wrapper function makes the greet function available to be accessed in other files.
+
+The code inside the wrapper is isolated and cannot access any variables outside the wrapper unless explicitly exposed through exports.
+
+How the Module Caching Works:
+Once a module is required using require(), it is cached in Node.js. This means if you require the same module multiple times, it won’t execute the module code again. It will just return the cached module exports.
+
+Summary of Module Wrapper Function:
+Every Node.js module is wrapped in a function that provides a local scope.
+
+The wrapper function uses exports, require, module, __filename, and __dirname to manage module exports and imports.
+
+It helps encapsulate the module’s code, preventing conflicts with other modules.
+
+In Node.js, variables that you declare within a module are local to that module because 
+they are wrapped inside the module wrapper function. This prevents global variables from polluting 
+the global scope and interfering with variables or functions in other modules.
+
+
+Each module in Node.js has its own wrapper function.
+
+In other words, every time you create a new module (i.e., a new .js file and require it), Node.js wraps the module code in a unique wrapper function. This ensures that each module has its own local scope, which is isolated from others. The wrapper function makes sure that variables and functions defined inside a module don't interfere with others.
+
+Explanation:
+One Wrapper Function Per Module:
+
+Node.js creates a unique wrapper function for each module to encapsulate the code inside it.
+
+This wrapper function is created internally by Node.js when you require a module, but you don’t see it explicitly in your code. It’s part of how Node.js handles modules internally.
+
+How It Works Internally:
+
+When you use require('module-name'), Node.js executes the code of the module inside a function that looks like this:
+
+javascript
+Copy
+(function (exports, require, module, __filename, __dirname) {
+  // Your module's code here
+});
+Scope Isolation:
+
+Inside each module, variables and functions are local to that module because they are wrapped in their own unique function.
+
+Even if two modules define variables with the same name, they will not interfere with each other because they are in separate wrapper functions.
+
+Example:
+Module 1 (module1.js):
+javascript
+Copy
+// Module 1 has its own wrapper function
+let greeting = "Hello from Module 1"; // Local to module1
+
+exports.printGreeting = function() {
+  console.log(greeting);
+};
+Module 2 (module2.js):
+javascript
+Copy
+// Module 2 has its own wrapper function
+let greeting = "Hello from Module 2"; // Local to module2
+
+exports.printGreeting = function() {
+  console.log(greeting);
+};
+Main Application (app.js):
+javascript
+Copy
+const module1 = require('./module1');
+const module2 = require('./module2');
+
+module1.printGreeting(); // Output: Hello from Module 1
+module2.printGreeting(); // Output: Hello from Module 2
+How Node.js Handles the Modules:
+When you require('./module1'), Node.js wraps module1.js in a wrapper function and executes it.
+
+Similarly, when you require('./module2'), it wraps module2.js in a separate wrapper function and executes that module's code.
+
+Even though both modules have a greeting variable, they do not conflict because each one is inside its own isolated wrapper function.
+
+Summary:
+Each module in Node.js has its own separate wrapper function to provide scope isolation.
+
+The wrapper function is automatically added by Node.js when the module is loaded, which keeps your variables and functions from clashing with others in the application.
