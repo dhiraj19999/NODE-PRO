@@ -6,3 +6,70 @@ system resources, hardware, and processes. Think of the OS as the overall system
   is a running instance of a program. The kernel acts as the intermediary between hardware and user 
   applications, handling tasks like memory allocation, process scheduling, and device control. Processes 
   are the active units of execution, and the kernel manages their creation, termination, and communication. 
+
+  1. Thread:
+A thread is the smallest unit of execution within a process. A process can contain multiple threads, which are often referred to as "lightweight" processes. Threads share the same resources (such as memory) of the parent process but are capable of executing independently.
+A thread is a path of execution within a process.
+Key points about threads:
+
+Each thread has its own program counter, stack, and registers.
+
+Threads within the same process can communicate with each other easily since they share memory.
+
+Threads are used to perform multiple tasks at once within a process (multi-threading).
+
+Example: In a web browser, one thread could be responsible for rendering the page, while another handles user input like scrolling.
+
+2. Concurrency:
+Concurrency is the ability of a system to handle multiple tasks at the same time, but not necessarily simultaneously. Instead of executing tasks in parallel, concurrency refers to the process of managing multiple tasks by switching between them rapidly, giving the illusion of simultaneous execution.
+
+Key points about concurrency:
+
+It allows for multitasking by breaking tasks into smaller units and switching between them (context switching).
+
+Concurrency does not require parallel execution — a single-core processor can handle concurrency by switching between tasks.
+
+It is particularly useful for tasks that involve waiting, such as I/O operations (e.g., reading files, network requests).
+
+Example: A server handling multiple client requests at once — it switches between tasks so that it appears to be handling them simultaneously. But in reality, it's handling them one at a time.
+
+3. Parallelism:
+Parallelism is a type of execution where multiple tasks are executed simultaneously. This is possible on multi-core processors, where each core executes a separate task concurrently.
+
+Key points about parallelism:
+
+Tasks are literally running at the same time.
+
+Parallelism improves the speed and performance of programs by taking advantage of multiple CPU cores.
+
+It is often used in compute-heavy operations, such as processing large datasets or performing complex calculations.
+
+Example: In a scientific simulation, multiple calculations (such as simulations of different particles) can be done in parallel, utilizing multiple CPU cores to speed up the overall process.
+
+Comparison:
+Thread: A unit of execution within a process.
+
+Concurrency: Managing multiple tasks at once (tasks might be executed in parallel or switched between).
+
+Parallelism: Executing multiple tasks simultaneously, often using multiple cores or processors.
+
+Real-World Analogy:
+Thread: Think of a thread as a single worker in an office. This worker performs one task at a time.
+
+Concurrency: Concurrency is like a multi-tasking worker who switches between multiple tasks (e.g., answering emails, filing documents, attending meetings), but only one task is being done at a time.
+
+Parallelism: Parallelism is like having multiple workers doing different tasks simultaneously, e.g., one worker answers emails while another files documents, and a third attends meetings.
+
+When to Use Each:
+Threads are used when you need to perform lightweight operations in parallel but within the same process.
+
+Concurrency is useful when you need to handle many tasks, especially I/O-bound tasks, and you want to give the appearance of doing them at the same time.
+
+Parallelism is used when you want to perform tasks simultaneously to speed up computation-heavy tasks, typically on multi-core processors.
+
+Summary:
+Thread: A lightweight unit of execution within a process.
+
+Concurrency: Handling multiple tasks by switching between them (tasks may not be executed simultaneously).
+
+Parallelism: Running tasks simultaneously, often on different processors or cores.

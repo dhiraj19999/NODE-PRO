@@ -1,0 +1,18 @@
+import.meta is a special object in JavaScript (specifically in ECMAScript Modules) that provides metadata about the current module. It's particularly useful when you're working in module-based environments like with ES Modules in the browser or using modern tools like Vite, Node.js, or Deno.
+console.log(import.meta.url);
+This returns the fully qualified URL of the current module file. It's especially useful for getting file paths in a module-safe way:
+
+import.meta is only available inside ES modules.
+
+It's not global, and you can only use it inside the same module/file.
+
+Only import.meta.url is built-in by default.
+
+Other properties like dirname, filename → not included unless a tool adds them.
+// Assuming this is in a module file "example.mjs"
+console.log(import.meta.url);
+// Output might be: "file:///Users/you/project/example.mjs"
+
+import.meta.filename
+This property provides the file path of the current module. It's similar to import.meta.url but without the protocol and without the filename. It's useful for getting the file path without the module name:
+import.meta.dirname  

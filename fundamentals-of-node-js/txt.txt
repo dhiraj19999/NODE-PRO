@@ -179,3 +179,9 @@ Summary:
 Each module in Node.js has its own separate wrapper function to provide scope isolation.
 
 The wrapper function is automatically added by Node.js when the module is loaded, which keeps your variables and functions from clashing with others in the application.
+
+
+
+ES6 modules enhance JavaScript by allowing developers to modularize code, breaking it into manageable pieces that can be imported and reused across different parts of an application
+
+ES6 modules are a way to organize and structure JavaScript code into reusable pieces. They allow developers to split code into smaller, self-contained files, which can be shared across applications

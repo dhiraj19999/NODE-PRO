@@ -1,0 +1,61 @@
+diff bet  commonJS  and es6 modules
+
+
+commonJS  module //
+Sychronus file loading , file loads on main thread
+file extension is optional
+if we give full path then it will load any file
+not necessary to add type: commonJS in package.json becuz common js is default module of node js
+this keyword points to module.exports
+require keyword is not hoisted
+How require works (not hoisted)
+When you use require(), Node.js executes your script top to bottom.
+
+The code above the require runs before the module is loaded.
+
+require only loads the module at the line where it is called.
+console.log('Before require'); // Runs first
+
+const fs = require('fs'); // Loads fs module here
+
+console.log('After require');
+Output:
+
+
+Before require
+After require
+If you try to use fs before the require line, you'll get an error or undefined:
+
+
+console.log(fs); // ReferenceError: fs is not defined
+top level await keyword not allowed means async function ke under hi await use krna
+commonJS me ek hi value export kr skte hai like ek hi object 
+strict mode is not enabled by default
+
+
+
+ES6 module //
+asychnornus file loading , file loads on web worker thread
+file extension is required
+only .js and .mjs files are allowed
+nessacry to add type: module in package.json
+this keyword is undefined
+import keyword is hoisted 
+How import works (hoisted)
+import statements are processed before any code runs.
+
+Modules are loaded before your script executes.
+
+This means you can use imported values even above the import statement (in code logic terms), because import is hoisted.
+console.log(someValue); // Works fine (if someValue is exported)
+
+import { someValue } from './module.js';
+
+console.log('After import');
+Output:
+someValue from module
+After import
+top level await keyword  allowed means async function ke under and bahar  await use kr skte hai 
+es6 me multiple valus can be exported
+strict mode is enabled by default
+

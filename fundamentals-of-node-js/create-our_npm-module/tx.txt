@@ -1,0 +1,7 @@
+
+
+we create two files math.mjs and math.cjs under node_modules folder to create our npm module
+becuz
+according to project konsa module systme use krega us hiasb se file import ya require hogi 
+math.cjs for commonJS and math.mjs for ES6 module system
+////package.json me  abhi hum "type":"commonjs" bhi likhe to bhi app.js file run ho jayegi
