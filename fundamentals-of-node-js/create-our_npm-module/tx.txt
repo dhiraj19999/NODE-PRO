@@ -5,3 +5,12 @@ becuz
 according to project konsa module systme use krega us hiasb se file import ya require hogi 
 math.cjs for commonJS and math.mjs for ES6 module system
 ////package.json me  abhi hum "type":"commonjs" bhi likhe to bhi app.js file run ho jayegi
+
+
+how to publish npm module
+crete account on npm website
+cd node_modules/math
+npm login 
+npm publish
+
+we can update our npm but have to change version number in package.json each time

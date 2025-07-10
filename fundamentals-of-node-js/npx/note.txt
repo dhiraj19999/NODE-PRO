@@ -1,0 +1,127 @@
+
+
+
+What npx do?
+it  searches for a file and executes it.
+
+command for this exmple=>  npx hello 
+this command excutes hello.js  ==>   hello from name key from package.json file
+search step 1 
+searches for package.json file in the current directory
+searches for "name" key in package.json file
+searches for "bin" key in package.json file
+
+
+search step 2 
+if package.json file does not existin
+it checks for node_modules/.bin/hello  file  to excute 
+
+search step 3 
+if package.json and node_modules/.bin/hello  file does not existin
+it checks for hello file in global npm folder and excutes this
+
+search step 4 
+if hello not found in global npm folder
+it finds hello package in npm registery and install it
+
+
+npm stands for Node Package Manager.
+We use npm to install packages into our project either locally or globally.
+
+On the other hand, npx stands for Node Package Execute.
+We use npx to run CLI tools directly without permanently installing them.
+
+For example, if I want to create a new React project:
+Instead of globally installing create-react-app using:
+
+
+npm install -g create-react-app
+create-react-app my-app
+I can simply run:
+
+
+npx create-react-app my-app
+This downloads the tool temporarily, runs it, creates the project, and then cleans up — no permanent install needed.
+
+npx also helps us avoid version conflicts, since it always uses the latest version of the tool when running it.
+
+CLI ka full form:
+Command Line Interface
+
+CLI tools woh hote hain jo terminal/command line pe chalte hain.
+
+📦 Example tools:
+create-react-app
+
+nodemon
+
+eslint
+
+prettier
+
+Ye sab ek tarah ke "tools" hote hain jo command line se kuch automate karte hain.
+
+ 1. Suppose tu React project banana chahta hai:
+🔹 Using npx (Best Way):
+
+npx create-react-app my-app
+create-react-app tool ko temporary download karta hai
+
+Project bana ke delete kar deta hai
+
+Project tu bana chuka hota hai (permanent)
+
+🔹 Using npm:
+
+npm install -g create-react-app
+create-react-app my-app
+Pehle tool ko permanently install karta hai
+
+Fir manually chalata hai
+
+
+Express ek CLI nahi hai, isliye usko npm se install karte hain."
+🔹 Let's Break It Down:
+📦 express
+Ek backend web framework hai for Node.js.
+
+Iska use tumhare code ke andar hota hai, like this:
+
+js
+Copy
+Edit
+const express = require('express');
+const app = express();
+Yeh terminal pe run nahi hota directly.
+
+Isliye isko npm install express se install kiya jaata hai.
+
+✅ Not a CLI tool → ❌ npx express ka koi matlab nahi
+
+🔹 Ab CLI tool kya hota hai?
+CLI (Command Line Interface) tool woh hota hai jo:
+
+Terminal me chalta hai
+
+Tumhare liye koi kaam automate karta hai
+
+Example:
+create-react-app — new React project banaata hai
+
+nodemon — server ko auto-restart karta hai
+
+eslint — code linting karta hai
+
+✅ Yeh sab tools terminal se run hote hain
+✅ Isliye npx ka use inme hota hai
+
+Jo packages sirf terminal/CLI pe kaam karte hain → npx se run karo
+Jo packages tumhare code ke andar use hote hain → npm install se install karo
+CLI tools ka kaam hota hai:
+
+Terminal commands lena
+
+Project banana / automation karna / linting / formatting, etc.
+
+"If a package is meant to be used inside our code, like express or react, we install it using npm install.
+But if it’s a command-line tool, like create-react-app or nodemon, we usually run it using npx, so we don’t need to install it globally."

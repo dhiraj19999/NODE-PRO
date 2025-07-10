@@ -1,0 +1,102 @@
+What is fs module in Node.js?
+
+fs (File System) is a built-in module in Node.js that allows you to work with files
+ and folders — like reading, writing, deleting, renaming, etc.
+
+
+ s module allows working with the file system. fs.readFileSync reads
+  files synchronously and blocks the main  thread, while fs.readFile is asynchronous 
+  and runs the file reading task in the background using the event loop
+
+  1. Understanding readFileSync(path, format) 
+	It takes a path of file as argument and format of file in a string form. It's return value is a buffer.
+	we can convert buffer to string using .toString() on buffer.
+	It is a Synchronous method which blocks the main thread.
+	Generally, we avoid using readFileSync() method.
+
+    2. Understading readFile(path, format, callback)
+	It takes 3 arguments path of file, format of the file in string form and a callback function.
+	Call back function has two parameters (error, data)
+	While reading the file if any error comes it will come in error parameter and operation will stop.
+	If file reading operation is successful it will put the file data in data parameter in buffer format.
+	It is an Asynchronous method which does not block the main thread.
+	
+3. node:fs/promises wala readFile
+	node:fs/promises It only has Asynchronous methods for file operations
+	It is more optimized since it uses promises.
+	We should use fs methods from node:fs/promises only.
+
+
+    "fs.readFile() agar hum encoding na dein to, woh raw buffer data deta hai (binary form).
+Lekin agar hum "utf8" pass karein, toh woh human-readable text form me data deta hai."
+
+🔍 Example Without Encoding:
+js
+Copy
+Edit
+const fs = require("fs");
+
+fs.readFile("demo.txt", (err, data) => {
+  if (err) throw err;
+  console.log(data); // Buffer output
+});
+🖥️ Output:
+r
+Copy
+Edit
+<Buffer 48 65 6c 6c 6f 20 44 68 69 72 61 6a>
+📦 This is a Buffer object — binary data (Hexadecimal format)
+
+🔍 Example With UTF-8 Encoding:
+js
+
+const fs = require("fs");
+
+fs.readFile("demo.txt", "utf8", (err, data) => {
+  if (err) throw err;
+  console.log(data); // Human-readable
+});
+🖥️ Output:
+nginx
+
+Hello Dhiraj
+🧠 Because we told Node.js: "Ye file string ke form me decode karo using utf8"
+
+What is Buffer?
+A Buffer is a built-in class in Node.js to handle binary data — like image, video, or file content from the disk or over the network.
+
+In simple words:
+
+Agar file image hai ya binary format me hai → use buffer as it is
+
+Agar file text hai → use "utf8" encoding to read as readable text
+
+
+"fs.writeFile() replaces the entire content of the file, while fs.appendFile() 
+adds content to the end. Both create the file if it doesn't exist, but one overwrites
+ and the other appends."
+
+ What is fs.watch() in Node.js?
+🔹 English:
+fs.watch() is a method from the fs module that watches a file or directory
+ for any changes — like file update, rename, add, delete — and triggers a 
+ callback when change happens.
+
+ fs.watch(filename[, options], listener)
+filename: File or folder to watch
+
+listener: (eventType, filename) => {} — callback when file/folder changes
+
+eventType: 'rename' or 'change'
+
+
+✅ What is fs.stat() in Node.js?
+🔹 English:
+fs.stat() is a method in Node.js that gives information about a
+ file or directory, like size, creation time, last modified, and
+  whether it's a file or folder.
+
+🔹 Hindi:
+fs.stat() ek function hai jo kisi file ya folder ke details ya
+ metadata batata hai — jaise size, banne ka time, last update, 
+ aur yeh file hai ya folder.

@@ -1,0 +1,34 @@
+What is worker_threads in Node.js?
+🔹 English:
+worker_threads is a module in Node.js that allows you to run JavaScript code in parallel threads, separate from the main thread.
+
+🔹 Hindi:
+worker_threads ek Node.js ka module hai jo aapko multiple threads me alag-alag JavaScript code chalane deta hai — matlab real multi-threading.
+
+✅ Why use it?
+Node.js is single-threaded by default (event loop). But for:
+
+CPU-intensive work (like large loops, image processing, encryption),
+
+we can use worker_threads to run heavy code in separate threads.
+
+🔧 Your Code:
+
+const { Worker } = require("worker_threads");
+
+new Worker("./a");
+new Worker("./b");
+new Worker("./c");
+🎯 What it means:
+You are creating 3 parallel workers (threads).
+
+Each worker will execute its own file:
+
+a.js
+
+b.js
+
+c.js
+
+✅ So 3 threads will run in parallel without blocking the main thread.
+

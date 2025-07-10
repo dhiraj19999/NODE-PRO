@@ -1,6 +1,187 @@
+1. What is process in Node.js?
+
+process is a global object in Node.js that gives information and control over the current 
+Node.js process (running program).
+
+Use Cases:
+Reading env variables (process.env)
+
+Graceful shutdown (process.on('exit', ...))
+
+Accepting command-line arguments
+
+Monitoring performance
+
+Is Node.js Single-threaded or Multi-threaded?
+
+Node.js is single-threaded for JavaScript execution,
+but uses multiple threads in the background for I/O operations using the libuv library.
+Node.js uses a single main thread to run JavaScript code (Event Loop).
+But for asynchronous tasks like file system, network calls, DNS, crypto, it uses worker threads (in background) — so it's non-blocking and fast.
+
+"Node.js runs JavaScript on a single thread using an event loop, but performs I/O operations using multiple threads under the hood via libuv. This allows Node.js to be asynchronous and non-blocking."
+
+
+Node.js Architecture – How it works
+
+High-Level Architecture Components:
+✅ 1. Client Requests
+Browser ya client se Node.js server ko request milti hai.
+
+✅ 2. Event Loop
+Ye Node.js ka heart hai. Ye dekhta hai kya JavaScript chalani hai, kya callback complete hua hai, 
+kis request ka response bhejna hai, etc.
+Single Thread
+JavaScript execution ke liye ek hi thread use hota hai (event loop ke under).
+Thread Pool (libuv)
+Jab koi heavy ya async kaam hota hai (file read, API call, DB query), to libuv background me 4 threads ka ek pool use karta hai.
+Ye work complete hone par event loop ko callback deta hai.
+Callback Queue
+Jab koi async operation complete ho jata hai, uska callback yahan aata hai, event loop yahan se callbacks pick karta hai.
+V8 Engine
+Google Chrome ka V8 engine JavaScript ko compile karke fast banata hai.
+🧠 Step-by-Step Execution Flow:
+Client sends request to Node.js server
+
+Event Loop receives the request
+
+If task is simple (like math), it’s done in same thread
+
+If task is async (like file/database), it is sent to libuv thread pool
+
+Once background thread finishes, callback is placed in callback queue
+
+Event loop picks callbacks and sends response to client
+
+
+🧪 Example: File reading (Async vs Sync)
+
+// file: app.js
+const fs = require('fs');
+
+console.log("1️⃣ Start");
+
+// ✅ Async I/O operation (goes to thread pool)
+fs.readFile('demo.txt', 'utf8', (err, data) => {
+  if (err) throw err;
+  console.log("3️⃣ File content:", data);
+});
+
+console.log("2️⃣ End");
+
+
+🧾 Output:
+sql
+Copy
+Edit
+1️⃣ Start
+2️⃣ End
+3️⃣ File content: Hello Dhiraj from Node.js!
+
+
+
+🔍 What Happened Behind the Scenes?
+Step	               Description
+1️⃣	                  Console logs "Start" immediately
+fs.readFile()	         Goes to libuv thread pool (non-blocking)
+2️⃣	                       Console logs "End" — JS continues without waiting
+After file read done	     Callback goes to callback queue
+3️⃣	                       Event loop picks callback and prints file content
+
+
+
+
+Compare with Sync version:
+
+const fs = require('fs');
+
+console.log("1️⃣ Start");
+
+const data = fs.readFileSync('demo.txt', 'utf8');
+console.log("2️⃣ File content:", data);
+
+console.log("3️⃣ End");
+
+
+Output:
+sql
+Copy
+Edit
+1️⃣ Start
+2️⃣ File content: Hello Dhiraj from Node.js!
+3️⃣ End
+❌ Ye blocking hai — file read hone tak Node.js ruk jaata hai
+✅ Async version me Node.js aage badh jata hai — ye hi power hai event loop + thread pool ki
+
+nterview line you can say:
+“When we use async functions like fs.readFile, Node.js delegates the I/O task to a background thread. 
+JavaScript code keeps running, and once I/O is done, the callback is pushed to the queue. 
+This is how Node handles non-blocking I/O using its architecture.”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Modules in Node.js are reusable blocks of code that encapsulate related functionality. 
 They are similar to libraries in other programming environments, promoting code organization, 
 reusability, and maintainability.
+
+3 Main Types of Modules in Node.js:
+ Built-in Modules
+These come pre-installed with Node.js.
+provded by node.js
+You just need to require() them — no need to install.
+
+✅ Examples:
+
+const fs = require('fs');         // File system
+const http = require('http');     // Create server
+const path = require('path');     // Handle file paths
+const os = require('os');         // OS info
+
+
+User-Defined Modules
+Your own .js files — you create reusable logic and import them wherever needed.
+
+✅ Example:
+📁 math.js
+
+js
+Copy
+Edit
+function add(a, b) {
+  return a + b;
+}
+module.exports = add;
+📁 index.js
+
+js
+Copy
+Edit
+const add = require('./math');
+console.log(add(2, 3)); // 5
+✅ This is useful for splitting code into smaller, clean parts.
+
+3️⃣ Third-Party Modules
+These are modules created by the community, installed using npm.
+
+✅ Example:
+
+npm install express
+
+
+const express = require('express');
+const app = express();
+✅ These modules save time and provide advanced features
 
 commonJS Modules: Node.js uses CommonJS modules, which are based on the require() function for importing 
 and module.exports for exporting modules. This is the default module system used in Node.js.
@@ -10,6 +191,24 @@ Module.exports
 When we want to export a single class/variable/function from one module to another module, we use the 
 module.exports way.
 
+ What is exports in Node.js?
+exports is a shortcut/reference to module.exports
+It is used to add multiple properties/functions to the export object.
+WRONG usage of exports (common mistake):
+js
+Copy
+Edit
+// ❌ This breaks the link with module.exports
+exports = {
+  greet: () => "Hi",
+  age: 25
+};
+This will not work with require() because exports ≠ module.exports anymore.
+
+module.exports is the actual object returned when we require a module. exports is just a shorthand to 
+add properties to that object. If we need to export a single function or class, we use
+ module.exports = .... If we want to export multiple properties, we can use exports.name = ..., 
+ but we must not assign a new object directly to exports = {...}
 Exports
 
 When we want to export multiple variables/functions from one module to another, we use exports way.
@@ -41,17 +240,59 @@ while exports is used to export multiple properties or functions
 module is an object that contains all the properties and methods defined in the module. 
 and exports is an object inside the module oject means exports is a property of module object.
 
+The module object is a special object in Node.js that contains information about the current module (i.e., the current .js file).
+It has a key property called module.exports, which defines what values, functions, or objects will be shared with other files when they require() this module.
 
-
-
+console.log(module)//
+ Module {
+  id: '.',
+  path: '/Users/dhiraj/Desktop/project',
+  exports: {},
+  filename: '/Users/dhiraj/Desktop/project/test.js',
+  loaded: false,
+  children: [],
+  paths: [ '/node_modules', ... ]
+}
 Module Wrapper Function in Node.js
 In Node.js, every module is wrapped in a wrapper function to create a scope for the module's code. This ensures that the variables declared within a module are local to that module, and don’t conflict with variables in other modules.
+Variables or functions declared in a Node.js module are not global, they are local to that module"
 
+🔍 Why?
+Because Node.js har module ko internally wrap karta hai ek function ke andar like this:
+
+
+(function (exports, require, module, __filename, __dirname) {
+  // your code here
+});
+Toh jo bhi variable ya function tu declare karega us file me, wo us function (i.e., module) ke scope me hi rahega.
+
+✅ Node.js kya karta hai har module ke sath?
+Jab tu koi file banaata hai, jaise:
+
+js
+Copy
+Edit
+// file: myfile.js
+const x = 10;
+function greet() {
+  console.log("Hello");
+}
+Node.js is file ko internally aise wrap karta hai:
+
+js
+Copy
+Edit
+(function (exports, require, module, __filename, __dirname) {
+  const x = 10;
+  function greet() {
+    console.log("Hello");
+  }
+});
+Toh x aur greet() sirf is function ke andar hi accessible honge — yani wo local scope me honge.
 Wrapper Function Structure:
 When you require a module, Node.js wraps the module code inside a function like this:
 
-javascript
-Copy
+
 (function(exports, require, module, __filename, __dirname) {
   // Module code here
 });
@@ -185,3 +426,48 @@ The wrapper function is automatically added by Node.js when the module is loaded
 ES6 modules enhance JavaScript by allowing developers to modularize code, breaking it into manageable pieces that can be imported and reused across different parts of an application
 
 ES6 modules are a way to organize and structure JavaScript code into reusable pieces. They allow developers to split code into smaller, self-contained files, which can be shared across applications
+
+
+The package.json file is a fundamental part of any Node.js project. It is a JSON file located at the root of the project directory, serving as a manifest that contains crucial information about the project. This file is used by Node.js and the npm (Node Package Manager) to manage project dependencies, scripts, versions, and other important metadata.
+The package-lock.json file in Node.js is an automatically generated file that records the exact versions of all dependencies used in a project. It ensures consistent installations across different environments by locking down the specific versions of packages and their sub-dependencies.
+in short package-lock.json locks the versions of all dependencies used in a project, ensuring consistent installations across different environments.
+In software development, dependencies and devDependencies refer to packages or libraries a project relies on, but they differ in their purpose and usage. Dependencies are essential for a project to run in a production environment, while devDependencies are used only during development and testing. 
+
+📚 Library vs. CLI Package
+Library:
+
+A library is a collection of reusable code modules that provide specific functionalities, such as mathematical operations, data manipulation, or API interactions.
+
+Libraries are designed to be integrated into other programs, allowing developers to leverage existing code without reinventing the wheel.
+
+They typically do not run independently but are invoked by other programs or scripts.
+YouTube
+
+CLI (Command-Line Interface) Package:
+
+A CLI package is an application or tool that is executed directly from the command line.
+
+It often utilizes underlying libraries to perform its operations but provides a user-facing interface through the terminal.
+
+Examples include tools like git, npm, or pip, which can be run directly in the terminal to perform tasks.
+
+📦 Local vs. Global Package Installation
+Local Installation:
+
+Packages installed locally are added to a specific project's directory, typically within a node_modules folder for Node.js projects.
+
+These packages are only accessible within the context of that particular project.
+
+Local installations ensure that each project has its own set of dependencies, preventing version conflicts between projects.
+Reddit
++1
+Flavio Copes
++1
+
+Global Installation:
+
+Globally installed packages are available system-wide and can be run from any location in the terminal.
+
+This is common for CLI tools that you want to access universally, such as npm, create-react-app, or vue-cli.
+
+However, global installations can lead to version conflicts if different projects require different versions of the same tool
