@@ -1,0 +1,241 @@
+CPU Vs I/O Operations
+
+    CPU Operations:
+        Arithmetic Operations
+        Sorting
+        Searching
+        Rendering Graphics
+
+node use main thread for this oprations 
+  
+    I/O Operations:
+        File Reading & Writing
+        Db Querying
+        Network Request
+        User Input
+
+        NodeJS Handles I/O Operations in special way
+
+        ## What is Node.js ?
+
+> Node.js is a single-threaded, event-driven, non-blocking, asynchronous I/O runtime that allows developers to build scalable and high-performance applications, particularly suited for I/O-bound tasks such as file handling and network requests.
+> 
+
+**Async I/O (Asynchronous Input/Output)** in **Node.js** refers to a non-blocking way of handling I/O operations like reading files, querying databases, or making API calls. Instead of waiting for one task to finish before starting the next, Node.js can start a task and **move on to other work**, then come back when the task is done.
+
+### 🔧 How It Works
+
+Node.js uses a **single-threaded event loop** with a background thread pool. Here’s the flow:
+
+1. **You start an I/O operation** (e.g., file read).
+2. Node.js **delegates this task** to the OS or thread pool.
+3. Instead of waiting, Node.js **continues executing other code**.
+4. When the I/O is done, a **callback or promise** is triggered with the result.
+
+### 🧠 Real-World Analogy
+
+Imagine a chef (Node.js) who puts something in the oven (file read). 
+Instead of standing there waiting, the chef continues cooking other dishes. 
+Once the oven timer rings, the chef handles the cooked item. That’s async I/O.
+In synchronous I/O, when your program makes a request (e.g., reads a file), 
+it waits for the operation to complete before moving on to the next line of code.
+
+Event Dirven Architecture
+
+    NodeJS I/O operations are based on Event Driven Architecture.
+    It is a design pattern.
+
+    3 Components of Event Dirven Architecture
+        Event Emitter
+        Event Listner
+        Event Handler
+
+    Example of EDA pattern
+        NodeJS
+        Browser DOM Events
+        Chat Apps
+        OS Handling UserInputs
+        Youtube Notifications
+        Payment Processing System
+
+
+
+        🔁 1. Event Emitter
+Definition:
+The Event Emitter is the source or object that generates or emits an event when something occurs.
+
+Purpose:
+It signals that something has happened — like a user clicked a button or data was received.
+
+Example (Node.js):
+
+
+const EventEmitter = require('events');
+const emitter = new EventEmitter();
+
+// Emitting an event
+emitter.emit('orderPlaced', { orderId: 123, item: 'Book' });
+Real-Life Analogy:
+A doorbell acts like an emitter. When someone presses it, it "emits" the signal that someone is at the door.
+
+
+👂 2. Event Listener
+Definition:
+An Event Listener is the function or code that waits for a specific event to occur.
+
+Purpose:
+It listens for the event emitted by the emitter and then triggers the handler.
+
+Example (Node.js):
+
+
+emitter.on('orderPlaced', (data) => {
+  console.log('Order received:', data);
+});
+Real-Life Analogy:
+The person inside the house who hears the doorbell and gets up to check — this person is the listener.
+
+
+🔧 3. Event Handler
+Definition:
+The Event Handler is the function or code block that executes in response to the event.
+
+Purpose:
+It contains the logic that should run after the event is detected by the listener.
+
+Example (combined):
+
+javascript
+Copy
+Edit
+// Define handler
+function handleOrder(data) {
+  console.log(`Processing Order #${data.orderId} for ${data.item}`);
+}
+
+// Set up listener with handler
+emitter.on('orderPlaced', handleOrder);
+
+// Emit the event
+emitter.emit('orderPlaced', { orderId: 101, item: 'Laptop' });
+Real-Life Analogy:
+Once the person hears the doorbell (listener), they open the door (handler) — that's the action in response to the event.
+
+🔄 Summary Table:
+Component	Role	Code Example	                        Real-Life Analogy
+Event Emitter	Emits or triggers the event	emitter.emit()	     Pressing a doorbell
+Event Listener	Waits for the event to happen	emitter.on('event', handler)	Hearing the bell inside
+Event Handler	Defines what to do when event is triggered	function handleEvent() {...}	Opening the door
+
+
+Event Emitter in Nodejs
+
+    We get built-in EventEmitter class in NodeJS.
+    we can import it as:
+        import EventEmitter from "events"
+
+    This class have methods for emitting and creating custom events. for ex -> .on(), .emit(), etc
+
+    when we create an event it adds in the _events object as key and value as it event handler.
+
+    if 2 events are same then it will make an array and push both the handler in the array. And when event is emitted it will run both the handler function.
+
+    Extra properties:
+    .setMaxListners()
+    .once() -> Emit the event only once and deletes it
+
+
+
+
+
+
+
+    🔥 Real-Life Analogy: Zomato Order System
+Socho Zomato app pe tumne order kiya.
+
+Tumhara Order Place hona → Event Emit hua: orderPlaced
+
+Restaurant, Kitchen, aur Delivery Boy ko Notify karna → Listeners ne React kiya
+
+✅ EventEmitter in Real-Time Use Case: Order Notification System
+📁 Project Structure:
+matlab
+Copy
+Edit
+project/
+├── events/
+│   └── orderHandler.js
+├── index.js
+
+
+📄 events/orderHandler.js
+import { Order } from "../models/orderModel.js"; // Mongoose model
+
+export async function notifyRestaurant(data) {
+  console.log(`🧑‍🍳 Notifying restaurant about Order #${data.orderId}`);
+
+  // Database logic (e.g. save to MongoDB)
+  try {
+    const newOrder = new Order({
+      orderId: data.orderId,
+      item: data.item,
+      status: "Notified"
+    });
+    await newOrder.save();
+    console.log("✅ Order saved in DB");
+  } catch (error) {
+    console.error("❌ Error saving order:", error.message);
+  }
+}
+
+
+export function notifyDeliveryBoy(data) {
+  console.log(`🚴 Delivery boy assigned for Order #${data.orderId}`);
+}
+
+export function sendConfirmationToUser(data) {
+  console.log(`📩 Order Confirmation sent to user for ${data.item}`);
+}
+
+
+📄 index.js
+js
+Copy
+Edit
+import EventEmitter from "events";
+import {
+  notifyRestaurant,
+  notifyDeliveryBoy,
+  sendConfirmationToUser
+} from "./events/orderHandler.js";
+
+const emitter = new EventEmitter();
+
+// Attach all listeners to 'orderPlaced' event
+emitter.on("orderPlaced", notifyRestaurant);
+emitter.on("orderPlaced", notifyDeliveryBoy);
+emitter.on("orderPlaced", sendConfirmationToUser);
+// Emit the orderPlaced event
+const order = { orderId: 101, item: "Paneer Pizza" };
+emitter.emit("orderPlaced", order);
+
+
+🧠 Output:
+
+🧑‍🍳 Notifying restaurant about Order #101
+🚴 Delivery boy assigned for Order #101
+📩 Order Confirmation sent to user for Paneer Pizza
+
+
+
+🔄 Real-World Dependent Task Chain Example (Using EventEmitter)
+🔥 Scenario: Food Order System
+Jab user order place kare:
+
+Pehle order DB me save ho.
+
+Uske baad restaurant ko notify karo.
+
+Uske baad user ko confirmation email bhejo.
+
+Fir analytics service me log karo.

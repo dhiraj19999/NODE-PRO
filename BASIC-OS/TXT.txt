@@ -73,3 +73,8 @@ Thread: A lightweight unit of execution within a process.
 Concurrency: Handling multiple tasks by switching between them (tasks may not be executed simultaneously).
 
 Parallelism: Running tasks simultaneously, often on different processors or cores.
+
+
+
+when we want to creat env we can use export variblename=value  in  .bashrc command line or .bashrc file  to make varible global In
+ or in 
