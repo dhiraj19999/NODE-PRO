@@ -741,3 +741,35 @@ It interprets the byte values as Unicode characters.
 When you store binary data using UTF-8, you lose fidelity — the data is corrupted when read back.
 
 Images written via UTF-8 will not open properly again.
+
+
+
+🔄 Buffer vs Stream — Ekdum Simple Tarike Se:
+🔍 Feature	Buffer	Stream
+🧠 Kya hai?	Saara data ek sath memory me load hota hai	Data tukdon (chunks) me aata hai
+💾 Memory Usage	Zyada (pure file ek sath load hoti hai)	Kam (1 chunk ek time pe aata hai)
+⚙️ Performance	Chhoti files ke liye ok	Badi files, video/audio, network ke liye best
+⌛ Timing	Wait until full data loaded	Start processing while data is coming
+🔄 Use Case	Simple read/write	File upload, video streaming, large file processing
+
+✅ BUFFER Workflow:
+Client se image chunk me aati hai (HTTP nature ke wajah se).
+
+Tum har chunk collect karte ho (chunks.push(chunk)).
+
+Phir Buffer.concat(chunks) karke ek single bada buffer banate ho.
+
+Tabhi database me save karte ho (base64 ya raw form me).
+
+🧠 Matlab: Client chunk bhejta hai, lekin tum poori file ek sath memory me laake fir use store karte ho.
+Zyada RAM lagti hai, lekin implementation simple hoti hai.
+
+
+🚀 STREAM Workflow:
+Client se image again chunk me aati hai.
+
+Tum use directly pipe ya stream.write() ke through database/file me bhejte ho.
+
+Har chunk process hota jaata hai bina puri file memory me laaye.
+
+🧠 Matlab: Tum bina memory me poora file rakhe, chunk by chunk usse aage stream karte ho.
