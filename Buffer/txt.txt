@@ -1,0 +1,743 @@
+📦 What is ArrayBuffer?
+ArrayBuffer represents a fixed-length binary buffer.
+It is essentially an array of raw bytes.
+Mainly used for handling binary data, especially in:
+Web APIs (e.g., fetch, FileReader)
+Low-level operations like streams, WebSockets, etc.
+
+🧰 How to Create an ArrayBuffer
+
+let buffer = new ArrayBuffer(16);  
+// Creates 16 bytes (128 bits)
+This creates a memory block with 16 bytes.
+Initial content (in hex):
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+📌 Key Properties
+Property
+Description
+byteLength
+Returns the total size (in bytes) of the buffer.
+detached
+(Internal slot) Indicates if buffer is detached.
+maxByteLength
+Only available for resizable ArrayBuffers.
+resizable
+Newer feature – allows buffer to grow/shrink.
+
+⚠️ Not all engines support resizable and maxByteLength yet.
+🧹 Memory Handling
+ArrayBuffers are automatically garbage collected by JS when no longer referenced.
+Efficient for handling binary files (images, audio, etc.).
+
+📏 Limitations
+Maximum size (browser): ~1.99 GiB (2^31 - 1 bytes)
+
+
+ArrayBuffer
+	
+	Array of Bytes
+	In Browser ArrayBuffer() is a constructor function.
+	So it need to called with new keyword.
+
+	It has some properties:
+		byteLength
+		detached
+		maxByteLength
+		resizeable.
+
+	We can store maximum 1.99 GiB in it.
+	
+	We cannot directly update the array buffer.
+	We use typedArray and Dataview for it.
+	ArrayBuffer are Garbage Collected in JS.
+
+
+    ArrayBuffer can be used for video uploading to a server, especially when you need to handle raw binary data. 
+Here's why and how:
+Handling Raw Binary Data: ArrayBuffer provides a mechanism for working directly with the raw binary data of a file. When uploading video files, which are inherently binary, ArrayBuffer allows you to access and manipulate that data at a low level.
+Chunking for Efficiency: For large video files, uploading them in one go can be inefficient and prone to errors (like network timeouts). You can use ArrayBuffer in conjunction with chunking techniques (splitting the video into smaller pieces) to upload the video more efficiently and reliably.
+
+
+Signed vs Unsigned Binary Numbers
+📌 Basics
+Computers represent numbers in binary.
+
+But binary alone doesn't indicate whether a number is positive or negative.
+
+That's where Signed and Unsigned concepts come in.
+
+🔢 Unsigned Binary
+Can store only non-negative values.
+
+Entire bit space is used to represent magnitude.
+
+✅ 8-bit Unsigned Range:
+0 to 255 (2⁸ = 256 possible values)
+
+🔁 Signed Binary (2's Complement)
+Used to represent both positive and negative numbers.
+
+The most significant bit (MSB) is reserved as the sign bit:
+
+0 → positive number
+
+1 → negative number
+
+✅ 8-bit Signed Range:
+-128 to +127
+(Still 256 values, but split between negative and positive)
+
+✍️ How is a Negative Number Stored?
+If MSB is 1, it is assumed to be negative, and system uses 2’s complement to get the actual value.
+
+🧮 2’s Complement (Method to Get Negative Value)
+To find 2's complement of a binary number:
+
+Flip all bits (i.e., 0 → 1, 1 → 0)
+
+Add 1 to the result
+
+Example:
+plaintext
+Copy
+Edit
+Positive:   00000101  → 5
+
+Flip:       11111010  
+Add 1:      11111011  → -5 (2's complement representation)
+So 11111011 is how -5 is stored in an 8-bit signed buffer.
+
+⚠️ Important Note
+For 0 to 127, signed and unsigned binary are the same, because the MSB is 0.
+
+But from 128 to 255, they differ:
+
+In unsigned: It's just 128–255
+
+In signed: It's actually -128 to -1 (interpreted using 2’s complement)
+
+📘 Reading and Writing to ArrayBuffers
+
+📦 What is ArrayBuffer?
+A fixed-length binary data buffer.
+It does not provide methods to read or write data directly.
+To access or modify the content, we use:
+DataView
+or TypedArray (like Uint8Array, Int32Array, etc.)
+
+🛠 Creating an ArrayBuffer
+const a = new ArrayBuffer(4); 
+// Creates a 4-byte buffer
+
+🧪 Using DataView
+const view = new DataView(a); 
+// DataView allows fine-grained control
+You can use DataView to read/write different types (signed, unsigned, 16-bit, 32-bit, float, etc.)
+
+✍️ Setting Values in the Buffer
+We can use multiple ways to write the same value (80):
+view.setInt8(0, 80);         // Decimal
+view.setInt8(1, 0b1010000);  // Binary
+view.setInt8(2, 0x50);       // Hexadecimal
+view.setInt8(3, 0o120);      // Octal
+All 4 ways set the value 80 in different bytes.
+
+📥 Reading Values from the Buffer
+const value = view.getInt8(1);  // Reads the byte at index 1 as signed integer
+console.log(value);            // 80
+
+➖ Negative Numbers
+view.setInt8(0, -1);          // Store -1 in first byte
+view.getInt8(0);              // -1
+view.getUint8(0);             // 255
+getInt8() → reads as signed (interprets MSB as sign bit)
+getUint8() → reads as unsigned
+
+
+🧠 Writing Multi-Byte Data in ArrayBuffer
+✅ .setInt8()
+👉 Allows writing an 8-bit signed integer (range: -128 to 127).
+👉 Can also store unsigned integers using .setUint8() (range: 0 to 255).
+❌ Limitation: Can only store values up to 8 bits (1 Byte).
+
+✅ .setInt16()
+👉 Allows writing a 16-bit signed integer (range: -32,768 to 32,767).
+👉 For unsigned, use .setUint16().
+🛠️ Syntax:
+view.setInt16(byteOffset, value, littleEndian?)
+🧭 Endian (Byte Order)
+The 3rd argument in .setInt16() and .getInt16() specifies the endianness.
+If omitted, the default is Big Endian (false) — MSB comes first.
+To use Little Endian, explicitly pass true.
+🧪 Example:
+view.setInt16(0, 260);        // Big Endian by default
+view.setInt16(0, 260, true);  // Little Endian (reversed byte order)
+🧾 Reading with .getInt16():
+view.getInt16(0);         // Big Endian
+view.getInt16(0, true);   // Little Endian
+
+🧠 Also Available:
+.setInt32() / .setUint32() for 32-bit values.
+Works the same way, just handles 4 bytes (32 bits).
+
+🔁 Always match the endianness on both write and read to avoid incorrect values.
+🧃 Node.js Note: Node.js uses Little Endian internally, but DataView methods still default to Big Endian unless you pass true.
+
+🎯 Typed Arrays in JavaScript
+Typed Arrays give us a way to work directly with binary data using special array-like structures. They're optimized, fast, and backed by ArrayBuffer.
+
+🧱 What Are Typed Arrays?
+📌 Unlike DataView, which gives full low-level byte control, Typed Arrays are specialized views over ArrayBuffer for specific data types.
+💡 Typed Arrays don't have a common constructor, they’re each their own type (e.g., Int8Array, Uint32Array).
+
+🧪 List of Typed Arrays:
+Category
+Types
+Signed Integers
+Int8Array, Int16Array, Int32Array, BigInt64Array
+Unsigned Integers
+Uint8Array, Uint16Array, Uint32Array, BigUint64Array
+Clamped Integers
+Uint8ClampedArray
+Floating Point
+Float32Array, Float64Array
+
+🧮 Size Representation:
+8 ➜ Each element = 1 byte
+16 ➜ Each element = 2 bytes
+32 ➜ Each element = 4 bytes
+
+🛠️ Creating Typed Arrays
+1️⃣ Using an existing ArrayBuffer:
+const a = new ArrayBuffer(3);const u8 = new Uint8Array(a);
+2️⃣ Create with size:
+const u8 = new Uint8Array(4); 
+// 4 empty slots (0-filled)
+3️⃣ Create with values:
+const u8 = new Uint8Array([0xfe, 0x53, 0xde, 0x99]);
+4️⃣ Create and fill:
+const u8 = new Uint8Array(4).fill(7); // [7, 7, 7, 7]
+
+⚙️ TypedArray Features
+✅ Behaves like a normal array:
+.length, .map(), .forEach() and more are supported.
+⚠️ No resizing after creation.
+✅ Only supports numbers (integers or floats depending on the type).
+✅ Memory-safe: Each array only stores its specific type (e.g., Uint8Array only stores 8-bit unsigned integers).
+
+🧩 ArrayBuffer Extra Features
+maxByteLength: Used to define resizable buffers.
+= new ArrayBuffer(4, { maxByteLength: 10 }); // Resizable buffer
+Resizable: Default is false. Set true if maxByteLength is provided.
+Detached: If the buffer is transferred, it becomes detached (emptied).
+const a = new ArrayBuffer(4);
+const b = a.transfer(); // `a` becomes detached
+
+📌 Summary
+✅ Use DataView for fine control, use TypedArray for typed performance-friendly operations.
+📦 All backed by the same ArrayBuffer.
+
+
+🚀 Transferring ArrayBuffer Data from Memory to Disk and Network
+Binary data is not just meant to stay inside the memory (RAM) — we can store it into files or even send it over the internet 🌐.
+Let’s see how we can:
+
+💾 Write ArrayBuffer to Disk
+✅ Using TypedArray:
+import fs from "fs/promises";
+// Create an 8-byte Uint8Array
+const uint8Array = new Uint8Array(8);
+// Storing text "ProCodrr" in hex
+uint8Array[0] = 0x50; // P
+uint8Array[1] = 0x72; // r
+uint8Array[2] = 0x6f; // o
+uint8Array[3] = 0x43; // C
+uint8Array[4] = 0x6f; // o
+uint8Array[5] = 0x64; // d
+uint8Array[6] = 0x72; // r
+uint8Array[7] = 0x72; // r
+// Decode and check (Optional)
+// const decoder = new TextDecoder("utf-8");
+// console.log(decoder.decode(uint8Array)); 
+// Output: ProCodrr
+// Save to a file
+fs.writeFile("buffer-text.txt", uint8Array);
+
+✅ Using DataView:
+const view = new DataView(uint8Array.buffer);
+fs.writeFile("buffer-text.txt", view);
+📝 Both methods will write the binary content of "ProCodrr" to buffer-text.txt.
+
+🌐 Sending ArrayBuffer Over Network (Browser Access)
+We can even send our binary data via HTTP and view it on a browser!
+import http from "http";
+// Create and fill ArrayBuffer data
+const uint8Array = new Uint8Array(8);
+uint8Array[0] = 0x50;
+uint8Array[1] = 0x72;
+uint8Array[2] = 0x6f;
+uint8Array[3] = 0x43;
+uint8Array[4] = 0x6f;
+uint8Array[5] = 0x64;
+uint8Array[6] = 0x72;
+uint8Array[7] = 0x72;
+startServer(uint8Array);
+function startServer(responseData) {  
+const server = http.createServer((req, res) => {    res.setHeader("Content-Type", "text/plain; charset=utf-8");    
+res.setHeader("Access-Control-Allow-Origin", "*");    // Ignore favicon    
+if (req.url === "/favicon.ico") {      
+res.end();      
+return;    
+}    
+// Send buffer data as HTTP response    res.end(Buffer.from(responseData.buffer));  
+});  
+server.listen(3000, () => {    
+console.log("Listening on http://localhost:3000");  });
+}
+🔍 Now visit: http://localhost:3000
+📄 You’ll see the decoded text: ProCodrr
+
+
+
+💾 Buffer in Node.js
+🧠 What is Buffer?
+A Buffer in Node.js is just a specialized version of Uint8Array (i.e. an array of bytes) that comes with extra methods and features provided by Node.js — specifically designed for binary data handling 📦.
+
+🌐 Environment Info
+✅ Available globally in Node.js
+❌ Not available in the browser
+⚠️ new Buffer() is deprecated due to security risks
+✅ Use Buffer.from() or Buffer.alloc() instead
+If you're not getting autocomplete suggestions for Buffer methods, do one of the following:
+import { Buffer } from "buffer"
+OR: npm i @types/node -D (for TypeScript IntelliSense)
+
+🛠️ Ways to Create a Buffer
+✅ 1. Using Buffer.alloc(size)
+🔹 Creates an empty buffer of the given size
+🔹 Allocates memory safely (fills with 0s by default)
+const buffer = Buffer.alloc(4); // 4 bytes (32 bits)
+
+✅ 2. Using Buffer.from(...)
+🔹 Creates a buffer from a string, array, or ArrayBuffer
+🔹 Internally allocates more memory than required
+const arrayBuffer = new ArrayBuffer(4);
+const bufferFromAB = Buffer.from(arrayBuffer);
+
+🧪 Quick Test
+import { Buffer } from "buffer";// Create a buffer from an empty ArrayBuffer
+const a = new ArrayBuffer(4);
+const nodeBuffer = Buffer.from(a);
+// Print buffer content as string
+console.log(nodeBuffer.toString()); 
+// Output: empty string (since no text is stored)
+
+📝 Note:
+If this was just a plain ArrayBuffer or a Uint8Array, we would need to use TextDecoder to manually decode the content like this:
+const decoder = new TextDecoder("utf-8");
+console.log(decoder.decode(new Uint8Array(a)));
+🚀 But with Buffer, we don’t need TextDecoder!
+The .toString() method automatically decodes the byte content using UTF-8 by default. This makes Buffer more convenient for handling text-based binary data in Node.js.
+
+
+
+
+🧱 Buffer.alloc() vs Buffer.allocUnsafe()
+🔹 Buffer.alloc(size)
+✅ Creates a new buffer of the specified size
+✅ Initializes all bytes to 0
+🛡️ Safe to use — prevents data leaks
+🔁 Slower, since it wipes old memory (zero-fills)
+const safeBuf = Buffer.alloc(10);
+console.log(safeBuf); 
+// <Buffer 00 00 00 00 00 00 00 00 00 00>
+🧠 When to use:
+Use alloc() by default, especially when handling user data, passwords, or sensitive info.
+
+🔸 Buffer.allocUnsafe(size)
+🚀 Creates a new buffer but does NOT initialize memory
+⚠️ Might contain random/leftover data from previous memory usage
+⚡ Faster because it skips zero-filling
+🧨 Unsafe unless you manually overwrite the contents
+const unsafeBuf = Buffer.allocUnsafe(10);
+console.log(unsafeBuf); 
+// <Buffer 12 ff 00 78 9a ...> ← Unpredictable content!
+👀 Why is it unsafe?
+Node.js reuses memory for performance.
+If you don’t overwrite the buffer before use, you may accidentally leak private data.
+
+✅ When to Use What?
+Method
+Use Case
+Buffer.alloc()
+✔️ Safe default, especially for sensitive/user-facing data
+Buffer.allocUnsafe()
+⚡ Use only when performance matters AND you'll fill it manually
+
+
+🧼 Tip: How to zero-fill an allocUnsafe buffer
+const buf = Buffer.allocUnsafe(10);
+buf.fill(0); // ✅ Safely zero out the memory
+
+🧪 Quick Demo
+const a = Buffer.alloc(5);
+const b = Buffer.allocUnsafe(5);
+console.log(a); // <Buffer 00 00 00 00 00>
+console.log(b); // <Buffer ?? ?? ?? ?? ??> ← Random data
+🧠 Best Practice: Always prefer alloc() unless you're doing performance-critical tasks and you're 100% sure the buffer will be overwritten.
+
+💥 What does "leak private data" mean in this context?
+When you use:
+const buf = Buffer.allocUnsafe(10);
+Node.js allocates 10 bytes of memory without clearing its previous contents.
+This memory might have been used before by other parts of your app — and could contain sensitive data like:
+🛡️ Passwords
+🔐 API keys or tokens
+📧 Email addresses
+🗂️ Database queries
+🧠 Anything previously stored in memory!
+If you log or send this buffer (e.g., as an HTTP response or to a file), you might unintentionally expose this old data.
+
+🧪 Example: Accidental Data Leak
+Let’s say earlier in your program you had:
+const password = Buffer.from("MySecret123");
+That gets garbage collected later...
+Now you do:
+const unsafeBuffer = Buffer.allocUnsafe(10);
+console.log(unsafeBuffer.toString());
+You might get something like:
+MySecret1
+😱 Surprise! Your old password is still in memory — and now leaked through unsafeBuffer.
+
+✅ How to stay safe
+If you must use Buffer.allocUnsafe() for performance, always overwrite the memory first:
+const buf = Buffer.allocUnsafe(10);
+buf.fill(0); // ✅ Clears old junk data
+
+
+🧵 Buffer Pool in Node.js 🔁
+When we create buffers using Buffer.allocUnsafe(), Node.js uses a shared memory pool (an ArrayBuffer) to speed things up 🚀.
+
+⚙️ How It Works:
+Node.js maintains a buffer pool of size 8 KiB = 8192 bytes.
+Buffer.poolSize; // 8192
+This pool is a single large ArrayBuffer shared across small Buffer instances.
+
+✅ Condition for Using Buffer Pool:
+To be eligible to use the shared buffer pool:
+BufferSize < Buffer.poolSize >>> 1
+i.e.
+🔸 Buffer size < 4096 bytes (half of pool)
+If:
+✔️ Size is small AND
+✔️ Enough space is available in the pool
+→ ✅ The buffer will be allocated from the pool (faster, shared)
+If:
+❌ Size ≥ 4096
+OR
+❌ Not enough room left in pool
+→ 🆕 A new ArrayBuffer is allocated exclusively for that buffer.
+
+🎯 Practical Demo:
+import { Buffer, constants } from "buffer";
+const a = Buffer.alloc(4);           // Normal buffer
+const b = Buffer.allocUnsafe(4);     // Fast! May use pool
+const c = Buffer.allocUnsafeSlow(4); // Doesn’t use pool at all
+
+console.log(Buffer.poolSize); // 8192
+
+console.log(constants.MAX_LENGTH); // Max buffer size (~2GB)
+// Check underlying ArrayBuffer sizes:
+console.log(a.buffer.byteLength); // 4 (same as byteLength)
+
+console.log(b.buffer.byteLength); // 8192 (from pool!)
+
+⚡ Why allocUnsafe() is Fast?
+It doesn’t zero-fill memory, so saves time.
+If pool is used, memory is already pre-allocated — just slice and return.
+Shared memory usage avoids frequent allocation/deallocation.
+
+❗ Buffer.allocUnsafeSlow()
+Creates a new buffer without using the pool.
+Slower and more memory-consuming.
+const slowBuffer = Buffer.allocUnsafeSlow(4);
+console.log(slowBuffer.buffer.byteLength); // 4
+
+🧠 Bonus:
+Buffer.from(), Buffer.concat() also use allocUnsafe() internally to boost performance.
+You can modify pool size by:
+Buffer.poolSize = 16384; // New size for future pools
+But the first pool will still be 8192 — only future ones will use new size.
+
+📦 Constants from Buffer:
+import { Buffer, constants } from "buffer";
+constants.MAX_LENGTH         // ~2 GB (Max Buffer size)
+constants.MAX_STRING_LENGTH  // ~1 GB (Max String allowed)
+
+
+🧃 Buffer Methods & Properties in Node.js 🧠
+📦 Buffers in Node.js come with powerful built-in methods and properties to handle binary data.
+
+⚙️ Methods 🔧
+📤 Buffer.from(data)
+➡️ Converts string/array/arrayBuffer to a new Buffer.
+const buf = Buffer.from("Hello World!");
+console.log(buf.toString()); // Hello World!
+
+✍️ Buffer.write(string)
+➡️ Writes string to an existing buffer (returns bytes written).
+const buf = Buffer.alloc(8);
+buf.write("abc");
+console.log(buf.toString()); // abc
+
+📄 Buffer.toJSON()
+➡️ Converts buffer to a JSON object.
+console.log(buf.toJSON());
+/*{  
+type: 'Buffer',  
+data: [ 97, 98, 99, 0, 0, 0, 0, 0 ]
+}*/
+
+✂️ Buffer.subarray(start, end?)
+➡️ Like slice() but returns a view of the original buffer (no copy).
+console.log(buf.subarray(2).toString()); // c
+
+🧬 Buffer.copy(targetBuffer, targetStart, sourceStart, sourceEnd)
+➡️ Copies part of the buffer into another buffer.
+const b2 = Buffer.alloc(8);
+buf.copy(b2, 0, 0, 1);
+console.log(b2.toString()); // a (copied 'a' from buf)
+
+🔍 Buffer.includes(value)
+➡️ Checks if buffer includes a specific byte sequence.
+buf.includes('a'); // true
+
+🔁 Buffer.fill(value)
+➡️ Fills the entire buffer with a given value.
+buf.fill(0x41); // fills with 'A'
+console.log(buf.toString()); // AAAAAAAA
+
+🧾 Buffer.readInt8(offset)
+➡️ Reads 8-bit signed integer from given offset.
+buf.writeInt8(-10, 0);
+console.log(buf.readInt8(0)); // -10
+
+✏️ Buffer.writeInt8(value, offset)
+➡️ Writes signed 8-bit integer to given offset.
+
+🔢 Buffer.at(index)
+➡️ Returns the value at the given index (can be negative too like array).
+console.log(buf.at(0)); // 65 (ASCII for 'A')
+
+🧩 Properties 📐
+
+📏 buffer.buffer
+➡️ Returns the underlying ArrayBuffer.
+📐 buffer.byteLength
+➡️ Number of bytes used.
+🔁 buffer.byteOffset
+➡️ Offset in the underlying ArrayBuffer.
+🧮 buffer.length
+➡️ Total allocated size in bytes (usually same as byteLength).
+
+
+🚫 Limitations of Buffers in Node.js 💻
+
+🧱 What is the Limitation?
+When you use Buffer to read a file:
+import fs from "fs";const data = fs.readFileSync("large-file.txt");
+📌 It loads the entire file into RAM at once.
+
+⚠️ Problem
+🐢 Slows down the process (especially for large files).
+💥 Can crash the system or cause memory overflow if the file is too big.
+🧠 Not memory-efficient.
+
+🚀 Solution — Use Streams Instead!
+📦 Streams read data in chunks, not all at once:
+
+
+
+📦 Practical Use Case of Buffers in Node.js 💻
+
+📁 1. Reading Files
+When you read a file using fs.readFile() or fs.readFileSync(), the data is returned in the form of a Buffer.
+import fs from "fs";
+const data = fs.readFileSync("file.txt");
+console.log(data); 
+// <Buffer ...>
+console.log(data.toString()); 
+// Actual file content
+✅ This helps in efficiently handling binary data like images, audio, or large text files.
+
+🌐 2. Receiving Data from Client (Frontend to Backend)
+Whenever data is sent from a browser (frontend) to a Node.js server (backend), it is transmitted in binary format — i.e., as buffers.
+const http = require("http");
+http.createServer((req, res) => {  
+let data = [];  
+req.on("data", chunk => {    
+data.push(chunk); // Each chunk is a buffer  
+});  
+req.on("end", () => {    
+const fullData = Buffer.concat(data);    console.log(fullData.toString()); // Output the complete body    
+res.end("Received");  
+});}).listen(3000);
+✅ This is how form submissions, JSON payloads, or file uploads work.
+
+Array buffer loads in RAM and if we have large ammount of data in buffer then it cause to slow the system.To prevent this issue we use streams.
+
+Buffer Limitations: Actually ,when  we read files or data resources, loading  everything  at once consumes lot of memory , if file is bigger than available RAM  the  system might crash. To solve this problem we use streams , it  actually, handle data flow efficiently by processing data in the form of streams of chunks(small part of data) .
+
+
+🔐 Base64 Encoding in JavaScript
+
+🧠 What is Base64?
+Base64 is a character encoding that converts binary data into string/text format so that it can be safely transmitted over text-based mediums like emails, URLs, or APIs.
+
+🧾 Key Facts:
+🎯 Purpose: Encode binary data (like files, images) as text.
+🔢 Uses 64 characters:
+a–z, A–Z, 0–9, +, /
+🧮 Each character represents 6 bits
+📦 Base64 is a subset of ASCII
+
+🌐 In the Browser:
+We have 2 built-in functions:
+Method
+Purpose
+btoa()
+🔄 Binary ➡ ASCII (Base64)
+atob()
+🔄 ASCII (Base64) ➡ Binary
+
+⚠️ Limitation:
+These only work on strings, not raw binary data (like ArrayBuffer, Blob, etc.)
+
+📏 Byte Behavior:
+Base64 works in 3-byte chunks (3 × 8 = 24 bits ➡ 4 Base64 characters × 6 bits = 24 bits)
+If the binary data is less than 3 bytes, padding is added using:
+=  → for 1 missing byte  == → for 2 missing bytes
+➕ Extra 0s are filled in binary to complete the chunk.
+
+🧪 Example Flow:
+You provide a string "ABC"
+It's converted to binary using UTF-8
+Binary is broken into 6-bit chunks
+Each chunk is mapped to a Base64 character
+Final output: "QUJD"
+
+🧵 TL;DR
+🔍 Feature
+🔢 Value
+Total Characters
+64
+Used Bits
+6 bits
+Padding
+=
+Common Use
+Emails, URLs, JSON APIs
+Works Best With
+Text-safe transmission of binary
+
+Buffers contain raw binary data (0s and 1s).
+But many systems — like:
+🌐 HTTP headers
+📧 Emails
+📝 JSON payloads
+🖼️ HTML, CSS (inline images)
+…can’t handle binary safely. Base64 solves this by turning binary ➡ text.
+So instead of sending a file buffer as binary (which can get corrupted), you send it encoded in Base64.
+
+🧾 Base64 in NodeJS
+🔐 Base64 is used to encode binary data (like images, PDFs, files) into a text-based format, especially useful when the communication medium only supports text.
+
+📦 Base64 Characteristics
+✅ Encodes binary into 64 ASCII characters: A–Z, a–z, 0–9, +, /
+⚠️ Adds = for padding if data isn't divisible by 3
+📈 Increases file size by ~1.3x
+📤 Useful for sending/embedding files in:
+HTML, CSS (inline images)
+JSON, query strings
+Email attachments
+
+🖥️ Terminal Commands
+🔡 Encode image to Base64:
+base64 image.png
+🌐 Generate Data URL for inline use:
+echo "data:image/png;base64,$(base64 image.png)"
+You can paste the output directly into HTML:
+<img src="data:image/png;base64,iVBORw0KGg..." />
+
+🧬 Why Base64?
+💬 Many systems (HTTP, SMTP, JSON) only support plain text, not raw binary.
+🔁 Base64 ensures safe transmission/storage of binary in those systems.
+
+🧪 Base64url – URL-Safe Variant
+Base64url is a modified version of Base64 that works better in URLs and query parameters.
+Base64
+Base64url
++
+-
+/
+_
+=
+(removed)
+
+📌 Used in:
+🔐 JWT tokens
+🌐 Query strings
+📁 Web APIs
+Example:
+abc+123/== ➡ becomes ➡ abc-123_
+
+🔍 1. What is UTF-8?
+UTF-8 is a text encoding format.
+
+It's used to represent characters like letters, numbers, emojis, etc.
+
+Most files like .txt, .json, .html, etc., use UTF-8.
+
+It’s human-readable.
+
+✅ Use UTF-8 when:
+You are saving or reading text (e.g., "hello world", or base64 strings).
+
+You are storing a base64 string as a plain .txt file.
+
+🔍 2. What is Base64?
+Base64 is a way to represent binary data as text.
+
+It encodes binary files (images, PDFs, etc.) into text using only ASCII characters.
+
+Used when you need to store binary content in text environments (e.g., databases, JSON, HTML).
+
+✅ Use Base64 when:
+You want to convert a binary file to a string.
+
+You are writing a base64 string back as a binary file like .jpg, .pdf, etc.
+
+✅ When to Use Base64:
+Use it for binary data like:
+
+Images
+
+Audio
+
+Video
+
+Any non-text file (e.g., .jpg, .pdf, .zip)
+
+Base64 safely encodes binary into plain text, so it can be stored in .txt, .json, or databases.
+
+✅ You can later decode the Base64 string back to its exact original binary data.
+
+❌ Why Not Use UTF-8:
+UTF-8 is designed for text, not binary.
+
+It interprets the byte values as Unicode characters.
+
+When you store binary data using UTF-8, you lose fidelity — the data is corrupted when read back.
+
+Images written via UTF-8 will not open properly again.
