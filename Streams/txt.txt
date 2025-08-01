@@ -60,3 +60,18 @@ view.getInt8(0);              // -1
 view.getUint8(0);             // 255
 getInt8() → reads as signed (interprets MSB as sign bit)
 getUint8() → reads as unsigned
+
+
+
+📖 Readable Streams in Node.js
+Streams solve one of the biggest limitations of working with large files using Buffers.
+
+🧱 Why Not Just Use Buffers?
+❌ Limitation with Buffers:
+Cannot load files larger than 2 GiB using Buffer.
+Large file reading/writing puts pressure on RAM and increases CPU usage.
+✅ Streams to the Rescue:
+Streams process data in chunks instead of loading the entire file.
+Great for performance and memory efficiency.
+📥 Creating a Readable Stream
+To create a read stream in Node.js, we use the fs module (non-promises) because it directly supports streaming methods.
